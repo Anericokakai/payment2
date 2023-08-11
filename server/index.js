@@ -12,6 +12,8 @@ app.use(bodyparser.urlencoded({extended: true}))
 
 // ! import files
 const { login, create} = require('./routes/login')
+const {addCategory, getCategories} = require('./routes/addExpense')
+// const {match} = require('./routes/match')
 
 
 // ! connection to mongodb and server
@@ -38,6 +40,11 @@ const connect = mongoose.connect('mongodb://127.0.0.1:27017/payment').then(()=>{
 app.use(create)
 app.use(login)
 
+// ! match user
+// app.use(match)
 
+// ! get and add categories
+app.use(addCategory)
+app.use(getCategories)
 
 

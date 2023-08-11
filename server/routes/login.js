@@ -16,6 +16,7 @@ create.post("/api/v1/create", async (req, res) => {
     passwordHash: hashedPass,
     firstName: req.body.firstName,
     profilePic: req.body.profilepic,
+    username : req.body.username,
   };
 
   try {

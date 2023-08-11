@@ -1,6 +1,6 @@
 const express = require("express");
 const { users, category, expense } = require("../schemas/userSchema");
-const { get } = require("mongoose");
+// const { get } = require("mongoose");
 
 // ! add an expense
 const addExpense = express.Router();
@@ -12,13 +12,15 @@ addExpense.post("/api/v1/add-expense", async (req, res) => {
 const match = express.Router();
 match.get("/api/v1/get-match", async (req, res) => {
   console.log(req.body);
-  const searchedUser = await users.findOne({ username: req.body.username });
 
-  if (!searchedUser) {
-    return res.json({ message: "No such user" });
+  const getUsers = await users.aggregate([
+    { $project: { _id: 1, username: 1 } },
+  ]);
+
+  if (!getUsers) {
+    return res.json("failed to get users");
   }
-  // return res.json(searchedUser.username)
-  const matchUser = await searchedUser.sharingUser();
+  return res.json(getUsers);
 });
 
 // ! add category
@@ -41,11 +43,11 @@ addCategory.post("/api/v1/add-category", async (req, res) => {
 // ! get all categories
 const getCategories = express.Router();
 getCategories.get("/api/v1/get-categories", async (req, res) => {
-    const getCategories = await category.find({}, {Category : 1, _id: 0});
-    if(!getCategories){
-        return res.json("failes to get categories")
-    }
-    return res.json(getCategories)
+  const getCategories = await category.find({}, { Category: 1, _id: 0 });
+  if (!getCategories) {
+    return res.json("failes to get categories");
+  }
+  return res.json(getCategories);
 });
 
-module.exports = { addCategory, getCategories };
+module.exports = { addCategory, getCategories, match };

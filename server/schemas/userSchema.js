@@ -31,8 +31,12 @@ const expenseSchema = new mongoose.Schema({
     default: Date.now(),
     immutable: true,
   },
+  boughtBy : {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref : "Users"
+  },
 
-  boughtBy: {
+  sharedBy: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Users",
   },

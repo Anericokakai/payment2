@@ -28,7 +28,7 @@ create.post("/api/v1/create", async (req, res) => {
   } catch (error) {
     console.log(error.message);
     // todo remove sensitive content
-    return res.json(error.message)
+    return res.json(error.message).status(500)
   }
 });
 
@@ -36,6 +36,7 @@ create.post("/api/v1/create", async (req, res) => {
 const login = express.Router();
 login.post("/api/v1/login", async (req, res) => {
     const { email, password} = req.body
+    console.log(req.body);
     try {
         const checkUserExist = await users.findOne({email: email})
     if(!checkUserExist){

@@ -5,7 +5,7 @@ const { users, category, expense } = require("../schemas/userSchema");
 const addExpense = express.Router();
 addExpense.post("/api/v1/add-expense", async (req, res) => {
   console.log(req.body);
-  const { item, cost, boughtBy, categoryBought} = req.body
+  const { item, cost, sharedBy, boughtBy, categoryBought} = req.body
   try {
     const checkCategory = await category.findById({
       _id: categoryBought
@@ -14,8 +14,8 @@ addExpense.post("/api/v1/add-expense", async (req, res) => {
       return res.json("category does not exist");
     }
     const categoryToAdd = checkCategory.Category;
-
-    const checkUser = await users.findById({ _id: boughtBy });
+// who to share the expense with
+    const checkUser = await users.findById({ _id: sharedBy });
     if (!checkUser) {
       return res.json("User does not exist");
     }
@@ -23,8 +23,9 @@ addExpense.post("/api/v1/add-expense", async (req, res) => {
     const values = {
         item : item,
         Cost : cost,
-        boughtBy : boughtBy,
+        sharedBy : sharedBy,
         categoryBought : categoryBought,
+        boughtBy : boughtBy,
     }
 
     const addExpense = await expense.create(values)
@@ -32,11 +33,31 @@ addExpense.post("/api/v1/add-expense", async (req, res) => {
     if(!addExpense){
         return res.json("failed to add expense")
     }
-    return res.json(`Added expense to ${categoryToAdd} category to be shared with user ${userToAdd}`);
+
+    //  get user making the request
+    const userMaking = await users.findById({_id: boughtBy})
+    if(!userMaking){
+      return res.json("no such user")
+    }
+    const user  = userMaking.username
+    return res.json(`Added expense to ${categoryToAdd} category to be shared with user ${userToAdd} added by ${user}` );
   } catch (error) {
     return res.json(error.message);
   }
 });
+
+// ! get all expenses
+const getAllExpense = express.Router();
+getAllExpense.post("/api/v1/get-all-expenses", async(req,res)=>{
+  console.log(req.body);
+
+  // logic  == get all expenses where boughtby id is mine and sharedbyid is the sharing user
+  // and get all expenses where sharedbyid is mine and bought by id is for the sharing user
+  // will need myid and sharing user id
+  // where to get sharingid???
+
+
+} )
 
 // ! select specific user
 const match = express.Router();
@@ -80,4 +101,6 @@ getCategories.get("/api/v1/get-categories", async (req, res) => {
   return res.json(getCategories);
 });
 
-module.exports = { addCategory, getCategories, match, addExpense };
+
+
+module.exports = { addCategory, getCategories, match, addExpense, getAllExpense };

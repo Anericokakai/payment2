@@ -12,7 +12,7 @@ app.use(bodyparser.urlencoded({extended: true}))
 
 // ! import files
 const { login, create} = require('./routes/login')
-const {addCategory, getCategories,match,addExpense} = require('./routes/addExpense')
+const {addCategory, getCategories,match,addExpense, getAllExpense} = require('./routes/addExpense')
 // const {match} = require('./routes/match')
 
 
@@ -51,5 +51,6 @@ app.use(getCategories)
 // ! get all users
 app.use(match)
 
-// ! add expense
+// ! add, get expense
 app.use(addExpense)
+app.use(getAllExpense)

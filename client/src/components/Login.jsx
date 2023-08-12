@@ -1,22 +1,40 @@
-import React from "react";
-import "./login.css"
+import React from 'react'
+import "../components/scss/login.scss"
+import {login } from "../helpers/loginHelper"
 
 function Login() {
-  return (
-    <div className="login-container">
-      <div className="login-backgroud">
-        <div className="login-form">
-          <h2>Make easy Payments</h2>
-          <form action="" id="login" >
-            <input type="text" />
-            <input type="password" />
-            <button>Login</button>
-          </form>
-          <p>Forgort you password?</p>
-        </div>
-      </div>
-    </div>
-  );
+
+  // ! get form inputs
+  const form = document.querySelector('form');
+
+
+const handleClick = async (e) =>{
+  e.preventDefault();
+  await login(form).then((res)=>{
+    const response = res;
+    console.log(response);
+  })
+  
 }
 
-export default Login;
+  return (
+    <div className="login-container">
+      <div className="login-child">
+      <div className="heading">
+    <h2>Welcome to the Payment app</h2>
+      </div>
+      <div className="login-form">
+    <form action="">
+      <input name='username' type="text" placeholder='username' />
+      <input name='email' type="email"  placeholder='email'/>
+      <input name='password' type="password" placeholder='password' />
+      <button  onClick={handleClick} >Create account</button>
+      <p>Have an acoount? Login</p>
+    </form>
+      </div>
+      </div>
+    </div>
+  )
+}
+
+export default Login

@@ -1,0 +1,76 @@
+@import "./variables";
+
+* {
+  margin: 0;
+  padding: 0;
+}
+.login-container {
+  height: 100vh;
+  background-color: grey;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+
+  .login-child {
+    // background-color: blue;
+    border-radius: 10px;
+    width: 350px;
+    height: 400px;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    .heading {
+    //   background-color: red;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 25%;
+    }
+    .login-form {
+      background-color: green;
+      border-bottom: 10px;
+      flex: 75%;
+      
+      form {
+        display: flex;
+        height: 100%;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-evenly;
+        gap: 1em;
+
+        input{
+            width: 70%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background-color: grey;
+            color: white;
+
+            &::placeholder{
+                color: white;
+            }
+            
+
+        }
+        button{
+            padding: 8px 12px;
+            width: 120px;
+            border-radius: 60px;
+            cursor: pointer;
+            
+            // border-radius: 10%;
+
+        }
+
+        p{
+            cursor: pointer;
+
+        }
+
+      }
+    }
+  }
+}

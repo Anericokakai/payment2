@@ -36,7 +36,7 @@ const expenseSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Users",
   },
-  category: {
+  categoryBought: {
     type: mongoose.SchemaTypes.ObjectId,
     ref: "Category",
   },

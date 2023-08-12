@@ -1,11 +1,41 @@
 const express = require("express");
 const { users, category, expense } = require("../schemas/userSchema");
-// const { get } = require("mongoose");
 
 // ! add an expense
 const addExpense = express.Router();
 addExpense.post("/api/v1/add-expense", async (req, res) => {
   console.log(req.body);
+  const { item, cost, boughtBy, categoryBought} = req.body
+  try {
+    const checkCategory = await category.findById({
+      _id: categoryBought
+    });
+    if (!checkCategory) {
+      return res.json("category does not exist");
+    }
+    const categoryToAdd = checkCategory.Category;
+
+    const checkUser = await users.findById({ _id: boughtBy });
+    if (!checkUser) {
+      return res.json("User does not exist");
+    }
+    const userToAdd = checkUser.username;
+    const values = {
+        item : item,
+        Cost : cost,
+        boughtBy : boughtBy,
+        categoryBought : categoryBought,
+    }
+
+    const addExpense = await expense.create(values)
+
+    if(!addExpense){
+        return res.json("failed to add expense")
+    }
+    return res.json(`Added expense to ${categoryToAdd} category to be shared with user ${userToAdd}`);
+  } catch (error) {
+    return res.json(error.message);
+  }
 });
 
 // ! select specific user
@@ -50,4 +80,4 @@ getCategories.get("/api/v1/get-categories", async (req, res) => {
   return res.json(getCategories);
 });
 
-module.exports = { addCategory, getCategories, match };
+module.exports = { addCategory, getCategories, match, addExpense };

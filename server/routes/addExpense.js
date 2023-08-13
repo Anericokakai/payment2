@@ -1,46 +1,53 @@
 const express = require("express");
-const { users, category, expense } = require("../schemas/userSchema");
+const {
+  users,
+  category,
+  expense,
+  aggregateData,
+} = require("../schemas/userSchema");
 
 // ! add an expense
 const addExpense = express.Router();
 addExpense.post("/api/v1/add-expense", async (req, res) => {
   console.log(req.body);
-  const { item, cost, sharedBy, boughtBy, categoryBought} = req.body
+  const { item, cost, sharedBy, boughtBy, categoryBought } = req.body;
   try {
     const checkCategory = await category.findById({
-      _id: categoryBought
+      _id: categoryBought,
     });
     if (!checkCategory) {
       return res.json("category does not exist");
     }
     const categoryToAdd = checkCategory.Category;
-// who to share the expense with
+    // who to share the expense with
     const checkUser = await users.findById({ _id: sharedBy });
     if (!checkUser) {
       return res.json("User does not exist");
     }
     const userToAdd = checkUser.username;
     const values = {
-        item : item,
-        Cost : cost,
-        sharedBy : sharedBy,
-        categoryBought : categoryBought,
-        boughtBy : boughtBy,
-    }
+      item: item,
+      Cost: cost,
+      sharedBy: sharedBy,
+      categoryBought: categoryBought,
+      boughtBy: boughtBy,
+    };
 
-    const addExpense = await expense.create(values)
+    const addExpense = await expense.create(values);
 
-    if(!addExpense){
-        return res.json("failed to add expense")
+    if (!addExpense) {
+      return res.json("failed to add expense");
     }
 
     //  get user making the request
-    const userMaking = await users.findById({_id: boughtBy})
-    if(!userMaking){
-      return res.json("no such user")
+    const userMaking = await users.findById({ _id: boughtBy });
+    if (!userMaking) {
+      return res.json("no such user");
     }
-    const user  = userMaking.username
-    return res.json(`Added expense to ${categoryToAdd} category to be shared with user ${userToAdd} added by ${user}` );
+    const user = userMaking.username;
+    return res.json(
+      `Added expense to ${categoryToAdd} category to be shared with user ${userToAdd} added by ${user}`
+    );
   } catch (error) {
     return res.json(error.message);
   }
@@ -48,16 +55,47 @@ addExpense.post("/api/v1/add-expense", async (req, res) => {
 
 // ! get all expenses
 const getAllExpense = express.Router();
-getAllExpense.post("/api/v1/get-all-expenses", async(req,res)=>{
+getAllExpense.get("/api/v1/get-all-expenses", async (req, res) => {
   console.log(req.body);
+  // const { user_id, sharing } = req.body;
 
   // logic  == get all expenses where boughtby id is mine and sharedbyid is the sharing user
   // and get all expenses where sharedbyid is mine and bought by id is for the sharing user
   // will need myid and sharing user id
   // where to get sharingid???
 
+  // using aggregate
+  const totalCost = await expense.aggregate([
+    {
+      $group: {
+        _id: "$boughtBy",
+        totalCost: { $sum: "$Cost" },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "userDetails",
+      },
+    },
+    {
+      $project: {
+        user_id: "$_id",
+        totalCost: 1,
+        username: { $arrayElemAt: ["$userDetails.username", 0] },
+      },
+    },
+  ]);
 
-} )
+  const savedAggregate = await aggregateData.insertMany(totalCost);
+  if (!savedAggregate) {
+    return res.json("failed to write aggregate data");
+  }
+
+  return res.json(totalCost);
+});
 
 // ! select specific user
 const match = express.Router();
@@ -101,6 +139,10 @@ getCategories.get("/api/v1/get-categories", async (req, res) => {
   return res.json(getCategories);
 });
 
-
-
-module.exports = { addCategory, getCategories, match, addExpense, getAllExpense };
+module.exports = {
+  addCategory,
+  getCategories,
+  match,
+  addExpense,
+  getAllExpense,
+};

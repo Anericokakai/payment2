@@ -46,8 +46,19 @@ const expenseSchema = new mongoose.Schema({
   },
 });
 
+const aggregateSchema = new mongoose.Schema({
+  totalCost : Number,
+  user_id : {
+    type : mongoose.SchemaTypes.ObjectId,
+    ref : "Users"
+  },
+  username : String,
+},{_id: false})
+
+
 const users = mongoose.model("Users", userSchema);
 const category = mongoose.model("Category", categorySchema);
 const expense = mongoose.model("Expense", expenseSchema);
+const aggregateData = mongoose.model("aggregateData", aggregateSchema)
 
-module.exports = { users, category, expense };
+module.exports = { users, category, expense, aggregateData };
